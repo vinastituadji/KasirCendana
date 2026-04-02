@@ -155,7 +155,7 @@ class TransaksiController extends Controller
     public function batalkan(Penjualan $penjualan)
     {
         if ($penjualan->StatusPembayaran === 'lunas') {
-            return redirect()->back()->with('error', 'Pesanan yang sudah lunas tidak dapat dibatalkan.');
+            return redirect()->back()->with('error', 'Transaksi yang sudah lunas tidak boleh dihapus!');
         }
         DB::transaction(function () use ($penjualan) {
             foreach ($penjualan->detailPenjualan as $detail) {

@@ -93,6 +93,15 @@
                             <a href="{{ route('kasir.transaksi.show', $t) }}" class="btn btn-secondary btn-sm">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                             </a>
+                            @if($t->StatusPembayaran !== 'lunas')
+                                <form action="{{ route('kasir.transaksi.destroy', $t) }}" method="POST" onsubmit="return confirm('Yakin mau hapus transaksi ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        🗑 Hapus
+                                    </button>
+                                </form>
+                                @endif
                         </div>
                     </td>
                 </tr>

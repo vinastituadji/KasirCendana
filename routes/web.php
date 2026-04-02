@@ -49,6 +49,8 @@ Route::prefix('kasir')->name('kasir.')->middleware('kasir')->group(function () {
     Route::patch('/transaksi/{penjualan}/batalkan', [TransaksiController::class, 'batalkan'])->name('transaksi.batalkan');
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+
+    Route::delete('/transaksi/{penjualan}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy');
 });
 
 // ─── PELANGGAN ROUTES ───────────────────────────────────────────────────────
