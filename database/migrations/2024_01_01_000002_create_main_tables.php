@@ -30,7 +30,6 @@ return new class extends Migration
             $table->increments('PenjualanID');
             $table->date('TanggalPenjualan');
             $table->decimal('TotalHarga', 10, 2)->default(0);
-            $table->decimal('Diskon', 10, 2)->default(0);
             $table->enum('StatusPembayaran', ['lunas', 'belum_lunas'])->default('belum_lunas');
             $table->enum('StatusPesanan', ['aktif', 'dibatalkan', 'selesai'])->default('aktif');
             $table->unsignedInteger('PelangganID');

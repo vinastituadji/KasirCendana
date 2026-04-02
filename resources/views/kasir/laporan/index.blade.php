@@ -260,10 +260,6 @@ function openDetailModal(id) {
             </tr></thead>
             <tbody>${items}</tbody>
         </table>
-        <div style="margin-top:16px;padding:12px 16px;background:var(--sand-50);border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center">
-            <span style="font-weight:600">Diskon</span>
-            <span>Rp ${Number(t.diskon).toLocaleString('id-ID')}</span>
-        </div>
         <div style="margin-top:8px;padding:12px 16px;background:var(--sand-100);border-radius:var(--radius-sm);display:flex;justify-content:space-between;align-items:center">
             <span style="font-weight:700;font-size:15px">Total</span>
             <span style="font-weight:800;font-size:18px;color:var(--sand-700)">Rp ${Number(t.total).toLocaleString('id-ID')}</span>

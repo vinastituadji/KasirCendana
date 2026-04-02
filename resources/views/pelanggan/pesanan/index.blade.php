@@ -56,12 +56,6 @@
 
         <div style="padding:14px 22px;background:var(--sand-50);border-top:1px solid var(--sand-100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
             <div>
-                @if($p->Diskon > 0)
-                <div class="text-sm text-muted">Diskon: Rp {{ number_format($p->Diskon, 0, ',', '.') }}</div>
-                @endif
-                <div style="font-weight:800;font-size:16px;color:var(--sand-700)">Total: Rp {{ number_format($p->TotalHarga, 0, ',', '.') }}</div>
-            </div>
-            <div>
                 @if($p->StatusPesanan === 'aktif' && $p->StatusPembayaran === 'belum_lunas')
                 <form action="{{ route('pelanggan.pesanan.batalkan', $p) }}" method="POST"
                     onsubmit="return confirm('Batalkan pesanan ini? Stok akan dikembalikan.')">

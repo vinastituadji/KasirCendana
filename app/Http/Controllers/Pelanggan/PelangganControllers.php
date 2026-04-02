@@ -55,7 +55,6 @@ class KatalogController extends Controller
             $penjualan = Penjualan::create([
                 'TanggalPenjualan' => now()->toDateString(),
                 'TotalHarga' => $subtotal,
-                'Diskon' => 0,
                 'StatusPembayaran' => 'belum_lunas',
                 'StatusPesanan' => 'aktif',
                 'PelangganID' => $user->PelangganID,

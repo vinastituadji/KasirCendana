@@ -69,12 +69,6 @@
             </table>
         </div>
         <div style="padding:16px 20px;border-top:1px solid var(--sand-100)">
-            @if($penjualan->Diskon > 0)
-            <div class="d-flex justify-between text-sm mb-2">
-                <span class="text-muted">Diskon</span>
-                <span style="color:var(--red-500);font-weight:600">- Rp {{ number_format($penjualan->Diskon, 0, ',', '.') }}</span>
-            </div>
-            @endif
             <div class="d-flex justify-between" style="padding-top:10px;border-top:1px solid var(--sand-100)">
                 <span style="font-weight:700;font-size:15px">Total</span>
                 <span style="font-weight:800;font-size:20px;color:var(--sand-700)">Rp {{ number_format($penjualan->TotalHarga, 0, ',', '.') }}</span>

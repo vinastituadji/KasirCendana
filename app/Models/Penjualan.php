@@ -9,7 +9,7 @@ class Penjualan extends Model
     protected $table = 'penjualan';
     protected $primaryKey = 'PenjualanID';
     protected $fillable = [
-        'TanggalPenjualan', 'TotalHarga', 'Diskon',
+        'TanggalPenjualan', 'TotalHarga',
         'StatusPembayaran', 'StatusPesanan', 'PelangganID'
     ];
 
