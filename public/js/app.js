@@ -1,72 +1,80 @@
 // KasirCendana — Main JS
 
 // ── SIDEBAR TOGGLE ──────────────────────────────────────────────
-const sidebar = document.getElementById('sidebar');
-const menuToggle = document.getElementById('menuToggle');
-const sidebarOverlay = document.getElementById('sidebarOverlay');
+const sidebar = document.getElementById("sidebar");
+const menuToggle = document.getElementById("menuToggle");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
 
 if (menuToggle) {
-    menuToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        if (sidebarOverlay) sidebarOverlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+    menuToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+        if (sidebarOverlay)
+            sidebarOverlay.style.display = sidebar.classList.contains("open")
+                ? "block"
+                : "none";
     });
 }
 if (sidebarOverlay) {
-    sidebarOverlay.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        sidebarOverlay.style.display = 'none';
+    sidebarOverlay.addEventListener("click", () => {
+        sidebar.classList.remove("open");
+        sidebarOverlay.style.display = "none";
     });
 }
 
 // ── MODAL HELPERS ───────────────────────────────────────────────
 function openModal(id) {
     const el = document.getElementById(id);
-    if (el) el.classList.add('show');
+    if (el) el.classList.add("show");
 }
 
 function closeModal(id) {
     const el = document.getElementById(id);
-    if (el) el.classList.remove('show');
+    if (el) el.classList.remove("show");
 }
 
-document.querySelectorAll('[data-modal-close]').forEach(btn => {
-    btn.addEventListener('click', () => {
-        const target = btn.dataset.modalClose || btn.closest('.modal-backdrop')?.id;
+document.querySelectorAll("[data-modal-close]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+        const target =
+            btn.dataset.modalClose || btn.closest(".modal-backdrop")?.id;
         if (target) closeModal(target);
     });
 });
 
-document.querySelectorAll('.modal-backdrop').forEach(m => {
-    m.addEventListener('click', (e) => {
-        if (e.target === m) m.classList.remove('show');
+document.querySelectorAll(".modal-backdrop").forEach((m) => {
+    m.addEventListener("click", (e) => {
+        if (e.target === m) m.classList.remove("show");
     });
 });
 
 // ── FAQ ACCORDION ───────────────────────────────────────────────
-document.querySelectorAll('.faq-question').forEach(q => {
-    q.addEventListener('click', () => {
+document.querySelectorAll(".faq-question").forEach((q) => {
+    q.addEventListener("click", () => {
         const answer = q.nextElementSibling;
-        const isOpen = answer.classList.contains('show');
-        document.querySelectorAll('.faq-answer.show').forEach(a => a.classList.remove('show'));
-        document.querySelectorAll('.faq-question.open').forEach(a => a.classList.remove('open'));
+        const isOpen = answer.classList.contains("show");
+        document
+            .querySelectorAll(".faq-answer.show")
+            .forEach((a) => a.classList.remove("show"));
+        document
+            .querySelectorAll(".faq-question.open")
+            .forEach((a) => a.classList.remove("open"));
         if (!isOpen) {
-            answer.classList.add('show');
-            q.classList.add('open');
+            answer.classList.add("show");
+            q.classList.add("open");
         }
     });
 });
 
 // ── FAQ FLOATING BUTTON ─────────────────────────────────────────
-const faqBtn = document.getElementById('faqBtn');
+const faqBtn = document.getElementById("faqBtn");
 if (faqBtn) {
-    faqBtn.addEventListener('click', () => openModal('modalFAQ'));
+    faqBtn.addEventListener("click", () => openModal("modalFAQ"));
 }
 
 // ── AUTO DISMISS ALERTS ─────────────────────────────────────────
-document.querySelectorAll('.alert-auto').forEach(alert => {
+document.querySelectorAll(".alert-auto").forEach((alert) => {
     setTimeout(() => {
-        alert.style.opacity = '0';
-        alert.style.transition = 'opacity .4s';
+        alert.style.opacity = "0";
+        alert.style.transition = "opacity .4s";
         setTimeout(() => alert.remove(), 400);
     }, 3500);
 });
@@ -75,44 +83,44 @@ document.querySelectorAll('.alert-auto').forEach(alert => {
 let rowCount = 0;
 
 function formatRupiah(num) {
-    return 'Rp ' + Number(num).toLocaleString('id-ID');
+    return "Rp " + Number(num).toLocaleString("id-ID");
 }
 
 function hitungTotal() {
     let total = 0;
-    document.querySelectorAll('.row-subtotal').forEach(el => {
+    document.querySelectorAll(".row-subtotal").forEach((el) => {
         total += parseFloat(el.dataset.subtotal || 0);
     });
 
-    const diskonPersen = parseFloat(document.getElementById('diskon_persen')?.value || 0);
-    const diskonNominal = parseFloat(document.getElementById('diskon_nominal')?.value || 0);
+    const diskonPersen = parseFloat(
+        document.getElementById("diskon_persen")?.value || 0,
+    );
+    const nominalEl = document.getElementById("diskon_nominal");
+    let diskon = parseFloat(nominalEl?.value || 0);
 
-    let diskon = diskonNominal;
     if (diskonPersen > 0) {
         diskon = total * (diskonPersen / 100);
-        const nominalEl = document.getElementById('diskon_nominal');
         if (nominalEl) nominalEl.value = diskon.toFixed(0);
     }
 
     const totalAkhir = Math.max(0, total - diskon);
-    const el = document.getElementById('total-display');
-    const inputTotal = document.getElementById('total-hidden');
+    const el = document.getElementById("total-display");
     if (el) el.textContent = formatRupiah(totalAkhir);
-    if (inputTotal) inputTotal.value = totalAkhir.toFixed(2);
 }
 
-function tambahProdukRow(produkList) {
+function tambahProdukRow(produkList, selectedId = null, selectedJumlah = 1) {
     rowCount++;
-    const container = document.getElementById('produk-container');
+    const container = document.getElementById("produk-container");
     if (!container) return;
 
-    const row = document.createElement('div');
-    row.className = 'produk-row';
-    row.id = 'row-' + rowCount;
+    const row = document.createElement("div");
+    row.className = "produk-row";
+    row.id = "row-" + rowCount;
 
     let options = '<option value="">-- Pilih Produk --</option>';
-    produkList.forEach(p => {
-        options += `<option value="${p.id}" data-harga="${p.harga}" data-stok="${p.stok}">${p.nama} (Stok: ${p.stok})</option>`;
+    produkList.forEach((p) => {
+        const sel = selectedId && p.id == selectedId ? "selected" : "";
+        options += `<option value="${p.id}" data-harga="${p.harga}" data-stok="${p.stok}" ${sel}>${p.nama} (Stok: ${p.stok})</option>`;
     });
 
     row.innerHTML = `
@@ -120,7 +128,7 @@ function tambahProdukRow(produkList) {
             ${options}
         </select>
         <input type="number" class="form-control" name="produk[${rowCount}][jumlah]"
-            id="jumlah-${rowCount}" min="1" value="1" style="width:80px"
+            id="jumlah-${rowCount}" min="1" value="${selectedJumlah}" style="width:80px"
             onchange="updateSubtotal(${rowCount})" oninput="updateSubtotal(${rowCount})">
         <span class="row-subtotal text-bold" id="subtotal-${rowCount}" data-subtotal="0" style="min-width:120px; text-align:right">Rp 0</span>
         <button type="button" class="btn btn-danger btn-sm" onclick="hapusProdukRow(${rowCount})">
@@ -129,26 +137,34 @@ function tambahProdukRow(produkList) {
     `;
 
     container.appendChild(row);
+
+    // Hitung subtotal awal jika ada selected
+    if (selectedId) {
+        updateSubtotal(rowCount);
+    }
 }
 
 function hapusProdukRow(id) {
-    const row = document.getElementById('row-' + id);
+    const row = document.getElementById("row-" + id);
     if (row) row.remove();
     hitungTotal();
 }
 
 function updateSubtotal(id) {
     const select = document.querySelector(`#row-${id} .produk-select`);
-    const jumlahEl = document.getElementById('jumlah-' + id);
-    const subtotalEl = document.getElementById('subtotal-' + id);
+    const jumlahEl = document.getElementById("jumlah-" + id);
+    const subtotalEl = document.getElementById("subtotal-" + id);
     if (!select || !jumlahEl || !subtotalEl) return;
 
     const opt = select.options[select.selectedIndex];
     const harga = parseFloat(opt?.dataset?.harga || 0);
-    const stok  = parseInt(opt?.dataset?.stok || 0);
-    let jumlah  = parseInt(jumlahEl.value || 1);
+    const stok = parseInt(opt?.dataset?.stok || 0);
+    let jumlah = parseInt(jumlahEl.value || 1);
 
-    if (jumlah > stok) { jumlah = stok; jumlahEl.value = stok; }
+    if (jumlah > stok) {
+        jumlah = stok;
+        jumlahEl.value = stok;
+    }
 
     const sub = harga * jumlah;
     subtotalEl.textContent = formatRupiah(sub);
@@ -157,16 +173,16 @@ function updateSubtotal(id) {
 }
 
 // diskon persen to nominal
-const diskonPersenEl = document.getElementById('diskon_persen');
+const diskonPersenEl = document.getElementById("diskon_persen");
 if (diskonPersenEl) {
-    diskonPersenEl.addEventListener('input', hitungTotal);
+    diskonPersenEl.addEventListener("input", hitungTotal);
 }
 
-const diskonNominalEl = document.getElementById('diskon_nominal');
+const diskonNominalEl = document.getElementById("diskon_nominal");
 if (diskonNominalEl) {
-    diskonNominalEl.addEventListener('input', () => {
-        const p = document.getElementById('diskon_persen');
-        if (p) p.value = '';
+    diskonNominalEl.addEventListener("input", () => {
+        const p = document.getElementById("diskon_persen");
+        if (p) p.value = "";
         hitungTotal();
     });
 }

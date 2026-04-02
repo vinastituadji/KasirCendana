@@ -3,6 +3,18 @@
 @section('page-title', 'Manajemen Produk')
 
 @section('content')
+@if(session('error'))
+<script>
+    alert("{{ session('error') }}");
+</script>
+@endif
+
+@if(session('success'))
+<script>
+    alert("{{ session('success') }}");
+</script>
+@endif
+
 <div class="d-flex justify-between align-center mb-3 flex-wrap gap-2">
     <form method="GET" action="{{ route('kasir.produk.index') }}" class="d-flex gap-2 flex-wrap align-center">
         <div class="search-wrap">

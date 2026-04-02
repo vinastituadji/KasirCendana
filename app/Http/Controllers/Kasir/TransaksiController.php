@@ -15,67 +15,56 @@ class TransaksiController extends Controller
     public function index(Request $request)
     {
         $query = Penjualan::with('pelanggan', 'detailPenjualan.produk');
-
         if ($request->filled('status_pembayaran')) {
             $query->where('StatusPembayaran', $request->status_pembayaran);
         }
         if ($request->filled('status_pesanan')) {
             $query->where('StatusPesanan', $request->status_pesanan);
         }
-
-        $transaksi = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
+        $transaksi     = $query->orderByDesc('created_at')->paginate(10)->withQueryString();
         $pelangganList = Pelanggan::where('Role', 'pelanggan')->orderBy('NamaPelanggan')->get();
-        $produkList = Produk::where('Stok', '>', 0)->with('kategori')->orderBy('NamaProduk')->get();
-
+        $produkList    = Produk::with('kategori')->orderBy('NamaProduk')->get();
         return view('kasir.transaksi.index', compact('transaksi', 'pelangganList', 'produkList'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'PelangganID' => 'required|exists:pelanggan,PelangganID',
-            'produk' => 'required|array|min:1',
+            'PelangganID'       => 'required|exists:pelanggan,PelangganID',
+            'produk'            => 'required|array|min:1',
             'produk.*.ProdukID' => 'required|exists:produk,ProdukID',
-            'produk.*.jumlah' => 'required|integer|min:1',
-            'diskon_nominal' => 'nullable|numeric|min:0',
+            'produk.*.jumlah'   => 'required|integer|min:1',
+            'diskon_nominal'    => 'nullable|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($request) {
             $totalHarga = 0;
             $items = [];
-
             foreach ($request->produk as $item) {
                 $produk = Produk::findOrFail($item['ProdukID']);
                 if ($produk->Stok < $item['jumlah']) {
                     throw new \Exception('Stok produk ' . $produk->NamaProduk . ' tidak mencukupi.');
                 }
-                $subtotal = $produk->Harga * $item['jumlah'];
+                $subtotal    = $produk->Harga * $item['jumlah'];
                 $totalHarga += $subtotal;
-                $items[] = [
-                    'produk' => $produk,
-                    'jumlah' => $item['jumlah'],
-                    'subtotal' => $subtotal,
-                ];
+                $items[]     = ['produk' => $produk, 'jumlah' => $item['jumlah'], 'subtotal' => $subtotal];
             }
-
-            $diskon = floatval($request->diskon_nominal ?? 0);
+            $diskon     = floatval($request->diskon_nominal ?? 0);
             $totalAkhir = max(0, $totalHarga - $diskon);
-
-            $penjualan = Penjualan::create([
+            $penjualan  = Penjualan::create([
                 'TanggalPenjualan' => now()->toDateString(),
-                'TotalHarga' => $totalAkhir,
-                'Diskon' => $diskon,
+                'TotalHarga'       => $totalAkhir,
+                'Diskon'           => $diskon,
                 'StatusPembayaran' => 'belum_lunas',
-                'StatusPesanan' => 'aktif',
-                'PelangganID' => $request->PelangganID,
+                'StatusPesanan'    => 'aktif',
+                'PelangganID'      => $request->PelangganID,
             ]);
-
             foreach ($items as $item) {
                 DetailPenjualan::create([
-                    'PenjualanID' => $penjualan->PenjualanID,
-                    'ProdukID' => $item['produk']->ProdukID,
+                    'PenjualanID'  => $penjualan->PenjualanID,
+                    'ProdukID'     => $item['produk']->ProdukID,
                     'JumlahProduk' => $item['jumlah'],
-                    'Subtotal' => $item['subtotal'],
+                    'Subtotal'     => $item['subtotal'],
                 ]);
                 $item['produk']->decrement('Stok', $item['jumlah']);
             }
@@ -84,12 +73,88 @@ class TransaksiController extends Controller
         return redirect()->route('kasir.transaksi.index')->with('success', 'Transaksi berhasil dibuat.');
     }
 
+    public function edit(Penjualan $penjualan)
+    {
+        $penjualan->load('pelanggan', 'detailPenjualan.produk');
+        $pelangganList = Pelanggan::where('Role', 'pelanggan')->orderBy('NamaPelanggan')->get();
+        $produkList    = Produk::with('kategori')->orderBy('NamaProduk')->get();
+        return view('kasir.transaksi.edit', compact('penjualan', 'pelangganList', 'produkList'));
+    }
+
+    public function update(Request $request, Penjualan $penjualan)
+    {
+        $request->validate([
+            'PelangganID'      => 'required|exists:pelanggan,PelangganID',
+            'produk'           => 'required|array|min:1',
+            'produk.*.ProdukID'=> 'required|exists:produk,ProdukID',
+            'produk.*.jumlah'  => 'required|integer|min:1',
+            'diskon_nominal'   => 'nullable|numeric|min:0',
+            'StatusPembayaran' => 'required|in:lunas,belum_lunas',
+            'StatusPesanan'    => 'required|in:aktif,selesai,dibatalkan',
+            'TanggalPenjualan' => 'required|date',
+        ]);
+
+        DB::transaction(function () use ($request, $penjualan) {
+            foreach ($penjualan->detailPenjualan as $detail) {
+                if ($detail->produk) $detail->produk->increment('Stok', $detail->JumlahProduk);
+            }
+            $penjualan->detailPenjualan()->delete();
+
+            $totalHarga = 0;
+            $items = [];
+            foreach ($request->produk as $item) {
+                $produk = Produk::findOrFail($item['ProdukID']);
+                if ($produk->Stok < $item['jumlah']) {
+                    throw new \Exception('Stok produk ' . $produk->NamaProduk . ' tidak mencukupi.');
+                }
+                $subtotal    = $produk->Harga * $item['jumlah'];
+                $totalHarga += $subtotal;
+                $items[]     = ['produk' => $produk, 'jumlah' => $item['jumlah'], 'subtotal' => $subtotal];
+            }
+            $diskon     = floatval($request->diskon_nominal ?? 0);
+            $totalAkhir = max(0, $totalHarga - $diskon);
+
+            $penjualan->update([
+                'TanggalPenjualan' => $request->TanggalPenjualan,
+                'TotalHarga'       => $totalAkhir,
+                'Diskon'           => $diskon,
+                'StatusPembayaran' => $request->StatusPembayaran,
+                'StatusPesanan'    => $request->StatusPesanan,
+                'PelangganID'      => $request->PelangganID,
+            ]);
+
+            foreach ($items as $item) {
+                DetailPenjualan::create([
+                    'PenjualanID'  => $penjualan->PenjualanID,
+                    'ProdukID'     => $item['produk']->ProdukID,
+                    'JumlahProduk' => $item['jumlah'],
+                    'Subtotal'     => $item['subtotal'],
+                ]);
+                $item['produk']->decrement('Stok', $item['jumlah']);
+            }
+        });
+
+        return redirect()->route('kasir.transaksi.index')->with('success', 'Transaksi #' . $penjualan->PenjualanID . ' berhasil diperbarui.');
+    }
+
+    public function destroy(Penjualan $penjualan)
+    {
+        DB::transaction(function () use ($penjualan) {
+            if ($penjualan->StatusPesanan !== 'dibatalkan') {
+                foreach ($penjualan->detailPenjualan as $detail) {
+                    if ($detail->produk) $detail->produk->increment('Stok', $detail->JumlahProduk);
+                }
+            }
+            $penjualan->detailPenjualan()->delete();
+            $penjualan->delete();
+        });
+
+        return redirect()->route('kasir.transaksi.index')->with('success', 'Transaksi berhasil dihapus.');
+    }
+
     public function tandaiLunas(Penjualan $penjualan)
     {
-        $penjualan->update([
-            'StatusPembayaran' => 'lunas',
-            'StatusPesanan' => 'selesai',
-        ]);
+        $penjualan->update(['StatusPembayaran' => 'lunas', 'StatusPesanan' => 'selesai']);
         return redirect()->back()->with('success', 'Pesanan #' . $penjualan->PenjualanID . ' berhasil ditandai lunas.');
     }
 
@@ -98,14 +163,12 @@ class TransaksiController extends Controller
         if ($penjualan->StatusPembayaran === 'lunas') {
             return redirect()->back()->with('error', 'Pesanan yang sudah lunas tidak dapat dibatalkan.');
         }
-
         DB::transaction(function () use ($penjualan) {
             foreach ($penjualan->detailPenjualan as $detail) {
-                $detail->produk->increment('Stok', $detail->JumlahProduk);
+                if ($detail->produk) $detail->produk->increment('Stok', $detail->JumlahProduk);
             }
             $penjualan->update(['StatusPesanan' => 'dibatalkan']);
         });
-
         return redirect()->back()->with('success', 'Pesanan #' . $penjualan->PenjualanID . ' berhasil dibatalkan.');
     }
 

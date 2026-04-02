@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Produk;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ProdukController extends Controller
 {
@@ -90,10 +90,25 @@ class ProdukController extends Controller
 
     public function destroy(Produk $produk)
     {
-        if ($produk->Gambar && file_exists(public_path('images/products/' . $produk->Gambar))) {
-            unlink(public_path('images/products/' . $produk->Gambar));
-        }
-        $produk->delete();
-        return redirect()->route('kasir.produk.index')->with('success', 'Produk berhasil dihapus.');
+        // cek apakah produk pernah dipakai di detailpenjualan
+    $cek = DB::table('detailpenjualan')
+        ->where('ProdukID', $produk->ProdukID)
+        ->exists();
+
+    if ($cek) {
+        return redirect()->route('kasir.produk.index')
+            ->with('error', 'Produk sudah pernah dipesan, tidak bisa dihapus!');
+    }
+
+    // hapus gambar jika ada
+    if ($produk->Gambar && file_exists(public_path('images/products/' . $produk->Gambar))) {
+        unlink(public_path('images/products/' . $produk->Gambar));
+    }
+
+    // hapus produk
+    $produk->delete();
+
+    return redirect()->route('kasir.produk.index')
+        ->with('success', 'Produk berhasil dihapus.');
     }
 }

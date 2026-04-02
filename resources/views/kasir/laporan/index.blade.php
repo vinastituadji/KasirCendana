@@ -226,7 +226,7 @@
                 return [
                     'nama' => $d->produk?->NamaProduk ?? 'Produk dihapus',
                     'jumlah' => $d->JumlahProduk,
-                    'subtotal' => $d->SubTotal
+                    'subtotal' => $d->Subtotal
                 ];
             })->values()
         ];
