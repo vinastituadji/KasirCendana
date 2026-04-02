@@ -34,7 +34,6 @@ class TransaksiController extends Controller
             'produk'            => 'required|array|min:1',
             'produk.*.ProdukID' => 'required|exists:produk,ProdukID',
             'produk.*.jumlah'   => 'required|integer|min:1',
-            'diskon_nominal'    => 'nullable|numeric|min:0',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -49,12 +48,10 @@ class TransaksiController extends Controller
                 $totalHarga += $subtotal;
                 $items[]     = ['produk' => $produk, 'jumlah' => $item['jumlah'], 'subtotal' => $subtotal];
             }
-            $diskon     = floatval($request->diskon_nominal ?? 0);
-            $totalAkhir = max(0, $totalHarga - $diskon);
+            $totalAkhir = $totalHarga;
             $penjualan  = Penjualan::create([
                 'TanggalPenjualan' => now()->toDateString(),
                 'TotalHarga'       => $totalAkhir,
-                'Diskon'           => $diskon,
                 'StatusPembayaran' => 'belum_lunas',
                 'StatusPesanan'    => 'aktif',
                 'PelangganID'      => $request->PelangganID,
@@ -88,7 +85,6 @@ class TransaksiController extends Controller
             'produk'           => 'required|array|min:1',
             'produk.*.ProdukID'=> 'required|exists:produk,ProdukID',
             'produk.*.jumlah'  => 'required|integer|min:1',
-            'diskon_nominal'   => 'nullable|numeric|min:0',
             'StatusPembayaran' => 'required|in:lunas,belum_lunas',
             'StatusPesanan'    => 'required|in:aktif,selesai,dibatalkan',
             'TanggalPenjualan' => 'required|date',
@@ -111,13 +107,11 @@ class TransaksiController extends Controller
                 $totalHarga += $subtotal;
                 $items[]     = ['produk' => $produk, 'jumlah' => $item['jumlah'], 'subtotal' => $subtotal];
             }
-            $diskon     = floatval($request->diskon_nominal ?? 0);
-            $totalAkhir = max(0, $totalHarga - $diskon);
+            $totalAkhir = $totalHarga;
 
             $penjualan->update([
                 'TanggalPenjualan' => $request->TanggalPenjualan,
                 'TotalHarga'       => $totalAkhir,
-                'Diskon'           => $diskon,
                 'StatusPembayaran' => $request->StatusPembayaran,
                 'StatusPesanan'    => $request->StatusPesanan,
                 'PelangganID'      => $request->PelangganID,

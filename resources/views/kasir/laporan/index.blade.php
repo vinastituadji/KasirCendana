@@ -125,7 +125,6 @@
                     <th>Pelanggan</th>
                     <th>Tanggal</th>
                     <th>Total</th>
-                    <th>Diskon</th>
                     <th>Status Bayar</th>
                     <th>Status Pesanan</th>
                     <th>Detail</th>
@@ -138,7 +137,6 @@
                     <td style="font-weight:600">{{ $t->pelanggan?->NamaPelanggan }}</td>
                     <td>{{ $t->TanggalPenjualan?->format('d M Y') }}</td>
                     <td style="font-weight:700">Rp {{ number_format($t->TotalHarga, 0, ',', '.') }}</td>
-                    <td>{{ $t->Diskon > 0 ? 'Rp '.number_format($t->Diskon,0,',','.') : '-' }}</td>
                     <td>
                         @if($t->StatusPembayaran==='lunas')
                             <span class="badge badge-success">Lunas</span>
@@ -219,7 +217,6 @@
             'pelanggan' => $t->pelanggan?->NamaPelanggan,
             'tanggal' => $t->TanggalPenjualan?->format('d M Y'),
             'total' => $t->TotalHarga,
-            'diskon' => $t->Diskon,
             'status_bayar' => $t->StatusPembayaran,
             'status_pesanan' => $t->StatusPesanan,
             'items' => $t->detailPenjualan->map(function($d) {

@@ -35,7 +35,6 @@
                     <th>Pelanggan</th>
                     <th>Produk</th>
                     <th>Total</th>
-                    <th>Diskon</th>
                     <th>Tgl Pesanan</th>
                     <th>Status Bayar</th>
                     <th>Status Pesanan</th>
@@ -56,7 +55,6 @@
                         </span>
                     </td>
                     <td><span style="font-weight:700">Rp {{ number_format($t->TotalHarga, 0, ',', '.') }}</span></td>
-                    <td>{{ $t->Diskon > 0 ? 'Rp ' . number_format($t->Diskon, 0, ',', '.') : '-' }}</td>
                     <td>{{ $t->TanggalPenjualan?->format('d M Y') }}</td>
                     <td>
                         @if($t->StatusPembayaran === 'lunas')
@@ -143,23 +141,11 @@
 
                 <div class="divider"></div>
 
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label class="form-label">Diskon (%)</label>
-                        <input type="number" id="diskon_persen" class="form-control" min="0" max="100" step="0.01" placeholder="0">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Diskon (Nominal Rp)</label>
-                        <input type="number" id="diskon_nominal" name="diskon_nominal" class="form-control" min="0" step="0.01" placeholder="0">
-                    </div>
-                </div>
-
                 <div style="background:var(--sand-50);border-radius:var(--radius-md);padding:16px 20px;border:1px solid var(--sand-200)">
                     <div class="d-flex justify-between align-center">
                         <span style="font-size:14px;font-weight:600;color:var(--gray-600)">Total Pembayaran</span>
                         <span id="total-display" style="font-size:22px;font-weight:800;color:var(--sand-700)">Rp 0</span>
                     </div>
-                    <input type="hidden" name="diskon_nominal" id="total-hidden">
                 </div>
             </div>
             <div class="modal-footer">
