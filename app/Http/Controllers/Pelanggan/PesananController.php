@@ -14,7 +14,7 @@ class PesananController extends Controller
         $user = Auth::guard('pelanggan')->user();
         $pesanan = Penjualan::with('detailPenjualan.produk')
             ->where('PelangganID', $user->PelangganID)
-            ->orderByDesc('TanggalPenjualan')
+            ->orderByDesc('PenjualanID')
             ->paginate(10);
         return view('pelanggan.pesanan.index', compact('pesanan'));
     }

@@ -15,7 +15,7 @@ class KasirMiddleware
         }
 
         if (!Auth::guard('pelanggan')->user()->isKasir()) {
-            return redirect()->route('pelanggan.katalog')->with('error', 'Akses tidak diizinkan.');
+            return redirect()->route('katalog')->with('error', 'Akses tidak diizinkan.');
         }
 
         return $next($request);

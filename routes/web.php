@@ -49,8 +49,6 @@ Route::prefix('kasir')->name('kasir.')->middleware('kasir')->group(function () {
     Route::patch('/transaksi/{penjualan}/batalkan', [TransaksiController::class, 'batalkan'])->name('transaksi.batalkan');
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
-
-    Route::delete('/transaksi/{penjualan}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy');
 });
 
 // ─── PELANGGAN ROUTES ───────────────────────────────────────────────────────
@@ -60,4 +58,10 @@ Route::prefix('akun')->name('pelanggan.')->middleware('pelanggan.auth')->group(f
     Route::patch('/pesanan/{penjualan}/batalkan', [App\Http\Controllers\Pelanggan\PesananController::class, 'batalkan'])->name('pesanan.batalkan');
     Route::get('/profil', [App\Http\Controllers\Pelanggan\ProfilController::class, 'index'])->name('profil');
     Route::put('/profil', [App\Http\Controllers\Pelanggan\ProfilController::class, 'update'])->name('profil.update');
+
+    // Keranjang belanja — checkout harus di atas agar tidak tertangkap {produkId}
+    Route::post('/keranjang/checkout/proses', [App\Http\Controllers\Pelanggan\KatalogController::class, 'checkout'])->name('keranjang.checkout');
+    Route::post('/keranjang/{produk}', [App\Http\Controllers\Pelanggan\KatalogController::class, 'tambahKeranjang'])->name('keranjang.tambah');
+    Route::patch('/keranjang/{produkId}', [App\Http\Controllers\Pelanggan\KatalogController::class, 'updateKeranjang'])->name('keranjang.update');
+    Route::delete('/keranjang/{produkId}', [App\Http\Controllers\Pelanggan\KatalogController::class, 'hapusKeranjang'])->name('keranjang.hapus');
 });
