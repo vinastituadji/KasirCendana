@@ -29,14 +29,14 @@
 <div class="card mb-4">
     <div class="card-body" style="padding:16px 24px">
         <form method="GET" action="{{ route('kasir.laporan.index') }}" class="d-flex gap-2 flex-wrap align-center">
-            <div>
+            <!-- <div>
                 <label class="form-label mb-1">Dari Tanggal</label>
                 <input type="date" name="dari" class="form-control" value="{{ request('dari') }}">
             </div>
             <div>
                 <label class="form-label mb-1">Sampai Tanggal</label>
                 <input type="date" name="sampai" class="form-control" value="{{ request('sampai') }}">
-            </div>
+            </div> -->
             <div>
                 <label class="form-label mb-1">Status Pembayaran</label>
                 <select name="status_pembayaran" class="form-control">

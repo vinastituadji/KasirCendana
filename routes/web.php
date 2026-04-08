@@ -47,6 +47,7 @@ Route::prefix('kasir')->name('kasir.')->middleware('kasir')->group(function () {
     Route::get('/transaksi/{penjualan}', [TransaksiController::class, 'show'])->name('transaksi.show');
     Route::patch('/transaksi/{penjualan}/lunas', [TransaksiController::class, 'tandaiLunas'])->name('transaksi.lunas');
     Route::patch('/transaksi/{penjualan}/batalkan', [TransaksiController::class, 'batalkan'])->name('transaksi.batalkan');
+    Route::delete('/transaksi/{penjualan}', [TransaksiController::class, 'destroy'])->name('transaksi.destroy');
 
     Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
 });
